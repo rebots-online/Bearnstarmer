@@ -1,5 +1,7 @@
 # tl;justdraw! Initial Architecture & AST Abstraction (2025-02-14)
 
+> **Update 2025-12-31:** Canvas strategy now centers on Excalidraw (tldraw removed due to licensing). Refer to `docs/architecture/2025-12-31-excalidraw-migration.md` for the latest AST while treating tldraw mentions here as historical.
+
 ## Repository Baseline Assessment
 
 - Current repository contains documentation files (`PROMPT.md`, `PRD_Barnstormer.md`) and assets (`ASSETS/tldr-logo.png`).

@@ -1,5 +1,7 @@
 # tl;justdraw! Canvas, Agent, & Library Panels Integration Architecture (2025-02-15T00:00Z)
 
+> **Update 2025-12-31:** The canvas provider has migrated to Excalidraw in response to tldraw v4 licensing changes. Treat any tldraw references in this document as legacy; see `docs/architecture/2025-12-31-excalidraw-migration.md` for the current AST.
+
 ## Context & Objectives
 - Expand the existing `@tljustdraw/web` scaffold into the first interactive workspace layout.
 - Embed the tldraw canvas alongside dedicated agent and library side panels per the PRD.

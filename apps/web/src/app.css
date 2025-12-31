@@ -202,9 +202,16 @@ main {
   overflow: hidden;
   background: rgba(2, 6, 23, 0.85);
   border: 1px solid rgba(148, 163, 184, 0.14);
+  min-height: 520px;
 }
 
-.canvas-shell .tl-container {
+.canvas-shell .excalidraw {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.canvas-shell .excalidraw .App {
   background: transparent;
 }
 
