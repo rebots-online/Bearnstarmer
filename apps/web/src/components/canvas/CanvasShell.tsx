@@ -1,18 +1,18 @@
 import { createLogger } from '@shared-utils';
-import { Tldraw } from '@tldraw/tldraw';
-import '@tldraw/tldraw/tldraw.css';
+import { Excalidraw } from '@excalidraw/excalidraw';
+import '@excalidraw/excalidraw/index.css';
 import { useEffect } from 'react';
 
 const logger = createLogger({ name: '@tljustdraw/web/canvas-shell' });
 
 const CanvasShell = (): JSX.Element => {
   useEffect(() => {
-    logger.info('Canvas shell mounted');
+    logger.info('Excalidraw canvas shell mounted');
   }, []);
 
   return (
-    <div className="canvas-shell">
-      <Tldraw persistenceKey="tljustdraw-local" />
+    <div className="canvas-shell" aria-label="Excalidraw workspace">
+      <Excalidraw theme="dark" />
     </div>
   );
 };

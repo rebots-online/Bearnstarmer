@@ -2,10 +2,10 @@
 
 ## 0) Executive Summary (TL;DR)
 
-* **Product**: Visual brainstormer built on **tldraw**, with **Excalidraw library import**, **LLM agents** (curated list + optional BYO via bridge), **PWA** + **Tauri** desktop/mobile, **SSO**, and **RevenueCat** billing.
+* **Product**: Visual brainstormer built on **Excalidraw**, with **Excalidraw library import**, **LLM agents** (curated list + optional BYO via bridge), **PWA** + **Tauri** desktop/mobile, **SSO**, and **RevenueCat** billing.
 * **Who**: Teams and solo creators who want fast, AI‑assisted ideation without wrestling with canvas plumbing or model sprawl.
-* **Why now**: Agentic workflows + visual thinking are converging; we exploit speed by piggybacking on stock tldraw while differentiating with agent orchestration and semantic import/export.
-* **MVP in one line**: A collaborative tldraw board where you can import Excalidraw libraries and invite a curated LLM agent to add stickies, links, and structure — installable as PWA, with SSO + Pro gating via RevenueCat.
+* **Why now**: Agentic workflows + visual thinking are converging; we exploit speed by leaning on the permissive Excalidraw ecosystem while differentiating with agent orchestration and semantic import/export.
+* **MVP in one line**: A collaborative Excalidraw board where you can import Excalidraw libraries and invite a curated LLM agent to add stickies, links, and structure — installable as PWA, with SSO + Pro gating via RevenueCat.
 
 ---
 
@@ -13,7 +13,7 @@
 
 ### Goals
 
-1. **Frictionless brainstorming** on a robust canvas (tldraw) with multiplayer.
+1. **Frictionless brainstorming** on a robust canvas (Excalidraw) with a path to multiplayer.
 2. **Usability boost** via **Excalidraw library importer** (AA‑batteries included + user‑provided libraries).
 3. **LLM agent participation**: curated providers initially (Gemini, OpenAI/OpenRouter, Ollama local), with a bridge for later BYO.
 4. **Cross‑platform**: web, PWA, Tauri desktop/mobile.
@@ -54,12 +54,12 @@
 
 ## 4) Feature Requirements
 
-### 4.1 Canvas (tldraw)
+### 4.1 Canvas (Excalidraw)
 
-* Multiplayer (presence cursors, CRDT sync).
+* Single-player Excalidraw canvas with roadmap toward multiplayer/presence.
 * Shapes: rect, ellipse, arrow, text, sticky note, image.
 * Group/align, stack order, undo/redo.
-* Export/import: `.tldr.json` native; **convert** Excalidraw scene/library to tldraw nodes.
+* Export/import: native Excalidraw formats; maintain Excalidraw library ingestion.
 
 ### 4.2 Excalidraw Library Importer
 
@@ -106,7 +106,7 @@
 
 ## 5) Constraints & Principles
 
-* **Bridge‑first**: piggyback on stock tldraw; do not fork until necessary.
+* **Bridge‑first**: piggyback on stock Excalidraw; do not fork until necessary.
 * **Curate models** for stability and support; BYO via advanced settings (off by default) to contain support blast radius.
 * **Licensing clarity**: ship only MIT‑vetted libraries; URL/import for everything else.
 * **Security**: sanitize imported JSON, content security policy, rate‑limit agent ops.
@@ -115,9 +115,9 @@
 
 ## 6) Architecture (High Level)
 
-* **Frontend**: Vite + React + TS; tldraw canvas; panels for Agents, Libraries, Billing, Account.
+* **Frontend**: Vite + React + TS; Excalidraw canvas; panels for Agents, Libraries, Billing, Account.
 * **LLM Adapter**: provider registry; each provider implements `generate()`, `embed()` (future), and back‑pressure control.
-* **Importer**: Excalidraw‑to‑tldraw translator; schema validator; attribution registry.
+* **Importer**: Excalidraw ingestion (libraries/scenes); schema validator; attribution registry.
 * **Auth/Billing**: AuthService interface; RevenueCat SDK; webhook listener (serverless or small node service) to sync entitlements.
 * **Storage**: IndexedDB (offline boards/libs). Optional cloud sync in Pro/Team.
 
@@ -154,7 +154,7 @@
 
 **MVP (Weeks 0‑6)**
 
-* tldraw canvas + multiplayer
+* Excalidraw canvas (single-player first, extendable to multiplayer)
 * Library importer (URL + upload) + starter pack
 * Single curated LLM/provider (e.g., Gemini or OpenAI)
 * PWA basics; Tauri packaging
