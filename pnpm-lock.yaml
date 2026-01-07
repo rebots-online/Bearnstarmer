@@ -62,9 +62,9 @@ importers:
 
   apps/web:
     dependencies:
-      '@tldraw/tldraw':
-        specifier: ^2.3.0
-        version: 2.4.6(@types/react-dom@18.3.7(@types/react@18.3.24))(@types/react@18.3.24)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@excalidraw/excalidraw':
+        specifier: workspace:0.18.2
+        version: link:../packages/excalidraw
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -84,6 +84,8 @@ importers:
       vite:
         specifier: ^5.2.0
         version: 5.4.20(@types/node@20.19.17)
+
+  packages/excalidraw: {}
 
   packages/shared-utils:
     dependencies:
