@@ -5,7 +5,6 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true,
-    "types": ["vite/client"],
     "baseUrl": "."
   },
   "include": ["src"],
