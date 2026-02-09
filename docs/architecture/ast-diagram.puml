@@ -1,0 +1,199 @@
+@startuml Bearnstarmer_AST
+!theme plain
+title Bearnstarmer (tl;justdraw) - Architecture Structure Tree
+
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+package "tljustdraw-monorepo" as root {
+  
+  ' ==================== APPS ====================
+  package "apps/" as apps {
+    package "@tljustdraw/web" as web {
+      
+      package "src/" as webSrc {
+        
+        ' Entry Points
+        rectangle "main.tsx" as mainTsx #LightBlue
+        rectangle "App.tsx" as appTsx #LightBlue
+        rectangle "app.css" as appCss #LightGray
+        
+        ' Components Layer
+        package "components/" as components {
+          
+          package "canvas/" as canvas {
+            rectangle "CanvasShell.tsx" as canvasShell #LightGreen
+            note right of canvasShell
+              Wraps @excalidraw/excalidraw
+              Dark theme default
+            end note
+          }
+          
+          package "layout/" as layout {
+            rectangle "AppLayout.tsx" as appLayout #LightGreen
+            note right of appLayout
+              3-slot layout:
+              - librarySlot (aside)
+              - canvasSlot (section)
+              - agentSlot (aside)
+            end note
+          }
+          
+          package "panels/" as panels {
+            rectangle "PanelHeader.tsx" as panelHeader #LightGreen
+            rectangle "LibraryPanel.tsx" as libraryPanel #LightGreen
+            rectangle "AgentPanel.tsx" as agentPanel #LightGreen
+          }
+        }
+        
+        ' Hooks Layer
+        package "hooks/" as hooks {
+          rectangle "useAgentSession.ts" as useAgentSession #Wheat
+          note right of useAgentSession
+            Manages agent conversation
+            transcript, composer state
+          end note
+        }
+        
+        ' State Layer
+        package "state/" as state {
+          rectangle "agents.ts" as agentsState #Khaki
+          rectangle "libraries.ts" as librariesState #Khaki
+          note right of agentsState
+            AGENT_PROFILES[]
+            - Gemini Pro Vision
+            - OpenRouter GPT-4.1
+            - Ollama Llama 3.1
+          end note
+        }
+        
+        ' Types Layer
+        package "types/" as types {
+          rectangle "panels.ts" as panelsTypes #Plum
+          note right of panelsTypes
+            LibraryEntry
+            AgentProfile
+            AgentMessage
+            AgentSession
+          end note
+        }
+      }
+      
+      rectangle "index.html" as indexHtml #Silver
+      rectangle "package.json" as webPkg #Silver
+      rectangle "vite.config.ts" as viteConfig #Silver
+    }
+  }
+  
+  ' ==================== PACKAGES ====================
+  package "packages/" as packages {
+    package "@tljustdraw/shared-utils" as sharedUtils {
+      
+      package "src/" as sharedSrc {
+        rectangle "index.ts" as sharedIndex #LightBlue
+        rectangle "config.ts" as configTs #Orange
+        rectangle "logger.ts" as loggerTs #Orange
+        
+        note right of configTs
+          AppConfigSchema (Zod)
+          - environment
+          - backendUrl
+          - API keys (LLM providers)
+          - revenueCatApiKey
+          - featureFlags
+          loadEnvConfig()
+        end note
+        
+        note right of loggerTs
+          createLogger()
+          LogLevel: debug|info|warn|error
+          Child loggers, sinks
+        end note
+      }
+      
+      package "__tests__/" as sharedTests {
+      }
+    }
+  }
+  
+  ' ==================== DOCS ====================
+  package "docs/" as docs {
+    package "architecture/" as archDocs {
+      rectangle "*.md" as archMd #LightYellow
+    }
+    package "checklists/" as checklistDocs {
+      rectangle "*.md" as checklistMd #LightYellow
+    }
+  }
+  
+  ' ==================== ROOT CONFIG ====================
+  package "Root Config" as rootConfig {
+    rectangle "package.json" as rootPkg #Silver
+    rectangle "pnpm-workspace.yaml" as pnpmWorkspace #Silver
+    rectangle "tsconfig.base.json" as tsconfigBase #Silver
+    rectangle "vitest.config.ts" as vitestConfig #Silver
+    rectangle ".eslintrc.cjs" as eslint #Silver
+    rectangle ".prettierrc.json" as prettier #Silver
+  }
+}
+
+' ==================== DEPENDENCIES ====================
+mainTsx --> appTsx : renders
+appTsx --> appLayout : uses
+appTsx --> canvasShell : slot
+appTsx --> libraryPanel : slot
+appTsx --> agentPanel : slot
+appTsx --> useAgentSession : hook
+appTsx --> agentsState : imports
+appTsx --> librariesState : imports
+
+appLayout --> panelHeader : contains
+libraryPanel --> panelHeader : uses
+agentPanel --> panelHeader : uses
+
+libraryPanel --> panelsTypes : types
+agentPanel --> panelsTypes : types
+useAgentSession --> panelsTypes : types
+agentsState --> panelsTypes : types
+librariesState --> panelsTypes : types
+
+canvasShell --> loggerTs : imports
+appTsx --> loggerTs : imports
+useAgentSession --> loggerTs : imports
+
+sharedIndex --> configTs : exports
+sharedIndex --> loggerTs : exports
+
+' ==================== EXTERNAL DEPENDENCIES ====================
+package "External Dependencies" as external #LightCoral {
+  rectangle "@excalidraw/excalidraw" as excalidraw
+  rectangle "react / react-dom" as react
+  rectangle "vite" as vite
+  rectangle "zod" as zod
+}
+
+canvasShell --> excalidraw : uses
+appTsx --> react : uses
+web --> vite : bundled by
+configTs --> zod : validation
+
+' ==================== FUTURE: REVENUECAT ====================
+package "Future: RevenueCat Integration" as rcFuture #Pink {
+  rectangle "BillingService" as billingService
+  rectangle "EntitlementProvider" as entitlementProvider
+  rectangle "SubscriptionPanel" as subscriptionPanel
+  rectangle "WebhookHandler" as webhookHandler
+  
+  note bottom of rcFuture
+    Platforms:
+    - Web (Stripe via RC)
+    - Android (Google Play)
+    - Tauri2 (Win/Linux via Stripe)
+  end note
+}
+
+configTs ..> billingService : revenueCatApiKey
+billingService --> entitlementProvider
+entitlementProvider --> subscriptionPanel
+
+@enduml

@@ -13,7 +13,7 @@ export interface LibraryEntry {
 
 export type LibraryToggleHandler = (libraryId: string) => void;
 
-export type AgentProvider = 'google' | 'openrouter' | 'ollama';
+export type AgentProvider = 'ollama' | 'lmstudio' | 'vllm' | 'openrouter' | 'zai';
 
 export interface AgentProfile {
   id: string;

@@ -2,14 +2,21 @@ import { z } from 'zod';
 
 export type AgentRole = 'facilitator' | 'summarizer' | 'critic' | 'scribe';
 
+// Deprecated API keys for backward compatibility
+const DEPRECATED_KEYS = {
+  GEMINI_API_KEY: 'geminiApiKey',
+  OPENAI_API_KEY: 'openaiApiKey',
+} as const;
+
 const AppConfigSchema = z.object({
   environment: z.enum(['development', 'production', 'test']).default('development'),
   backendUrl: z.string().url().default('http://localhost:8787'),
   realtimeSyncUrl: z.string().url().nullable().default('ws://localhost:8787/sync'),
-  openRouterApiKey: z.string().min(1).nullable().default(null),
-  geminiApiKey: z.string().min(1).nullable().default(null),
-  openAIApiKey: z.string().min(1).nullable().default(null),
   ollamaBaseUrl: z.string().url().nullable().default('http://localhost:11434'),
+  lmstudioBaseUrl: z.string().url().nullable().default('http://localhost:1234/v1'),
+  vllmBaseUrl: z.string().url().nullable().default('http://localhost:8000/v1'),
+  openRouterApiKey: z.string().min(1).nullable().default(null),
+  zaiApiKey: z.string().min(1).nullable().default(null),
   revenueCatApiKey: z.string().min(1).nullable().default(null),
   defaultAgentRole: z
     .enum(['facilitator', 'summarizer', 'critic', 'scribe'])
@@ -85,24 +92,27 @@ const DESCRIPTORS: DescriptorMap = {
     env: 'TLJ_REALTIME_SYNC_URL',
     default: 'ws://localhost:8787/sync',
   },
+  ollamaBaseUrl: {
+    env: 'OLLAMA_BASE_URL',
+    default: 'http://localhost:11434',
+  },
+  lmstudioBaseUrl: {
+    env: 'LMSTUDIO_BASE_URL',
+    default: 'http://localhost:1234/v1',
+  },
+  vllmBaseUrl: {
+    env: 'VLLM_BASE_URL',
+    default: 'http://localhost:8000/v1',
+  },
   openRouterApiKey: {
     env: 'OPENROUTER_API_KEY',
     secure: 'OPENROUTER_API_KEY',
     default: null,
   },
-  geminiApiKey: {
-    env: 'GEMINI_API_KEY',
-    secure: 'GEMINI_API_KEY',
+  zaiApiKey: {
+    env: 'ZAI_API_KEY',
+    secure: 'ZAI_API_KEY',
     default: null,
-  },
-  openAIApiKey: {
-    env: 'OPENAI_API_KEY',
-    secure: 'OPENAI_API_KEY',
-    default: null,
-  },
-  ollamaBaseUrl: {
-    env: 'OLLAMA_BASE_URL',
-    default: 'http://localhost:11434',
   },
   revenueCatApiKey: {
     env: 'REVENUECAT_PUBLIC_API_KEY',
@@ -154,6 +164,16 @@ export class ConfigValidationError extends Error {
 export const loadEnvConfig = async (options: ConfigLoadOptions = {}): Promise<AppConfig> => {
   const env = options.envSource ?? (typeof process !== 'undefined' ? process.env : {});
   const overrides = options.overrides ?? {};
+  
+  // Check for deprecated API keys and issue warnings
+  Object.entries(DEPRECATED_KEYS).forEach(([deprecatedKey, _]) => {
+    if (env[deprecatedKey]) {
+      console.warn(
+        `Deprecated API key detected: ${deprecatedKey}. Please use ZAI_API_KEY instead.`
+      );
+    }
+  });
+  
   const resolvedEntries = await Promise.all(
     (Object.keys(DESCRIPTORS) as ConfigField[]).map(async (field) => {
       if (overrides[field] !== undefined) {

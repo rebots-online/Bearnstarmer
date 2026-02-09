@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { ConfigValidationError, loadEnvConfig } from '../src/config';
 
@@ -36,6 +36,9 @@ describe('loadEnvConfig', () => {
         if (key === 'OPENROUTER_API_KEY') {
           return 'secure-openrouter-key';
         }
+        if (key === 'ZAI_API_KEY') {
+          return 'secure-zai-key';
+        }
         return null;
       },
     };
@@ -43,6 +46,7 @@ describe('loadEnvConfig', () => {
     const config = await loadEnvConfig({ envSource: {}, secureStore });
 
     expect(config.openRouterApiKey).toBe('secure-openrouter-key');
+    expect(config.zaiApiKey).toBe('secure-zai-key');
   });
 
   it('parses feature flags JSON from IndexedDB store', async () => {
@@ -68,5 +72,35 @@ describe('loadEnvConfig', () => {
         },
       })
     ).rejects.toBeInstanceOf(ConfigValidationError);
+  });
+
+  it('loads ZAI_API_KEY from environment', async () => {
+    const config = await loadEnvConfig({
+      envSource: {
+        ZAI_API_KEY: 'test-zai-key',
+      },
+    });
+
+    expect(config.zaiApiKey).toBe('test-zai-key');
+  });
+
+  it('handles deprecated API keys with migration warning', async () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    
+    const config = await loadEnvConfig({
+      envSource: {
+        GEMINI_API_KEY: 'deprecated-gemini-key',
+        OPENAI_API_KEY: 'deprecated-openai-key',
+      },
+    });
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Deprecated API key detected: GEMINI_API_KEY. Please use ZAI_API_KEY instead.'
+    );
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Deprecated API key detected: OPENAI_API_KEY. Please use ZAI_API_KEY instead.'
+    );
+    
+    consoleSpy.mockRestore();
   });
 });

@@ -1,0 +1,145 @@
+---
+title: Bearnstarmer (tl;justdraw) - Architecture Structure Tree
+---
+
+flowchart TB
+    subgraph root["tljustdraw-monorepo"]
+        
+        subgraph apps["apps/"]
+            subgraph web["@tljustdraw/web"]
+                
+                subgraph webSrc["src/"]
+                    mainTsx["main.tsx"]
+                    appTsx["App.tsx"]
+                    appCss["app.css"]
+                    
+                    subgraph components["components/"]
+                        subgraph canvas["canvas/"]
+                            canvasShell["CanvasShell.tsx"]
+                        end
+                        
+                        subgraph layout["layout/"]
+                            appLayout["AppLayout.tsx"]
+                        end
+                        
+                        subgraph panels["panels/"]
+                            panelHeader["PanelHeader.tsx"]
+                            libraryPanel["LibraryPanel.tsx"]
+                            agentPanel["AgentPanel.tsx"]
+                        end
+                    end
+                    
+                    subgraph hooks["hooks/"]
+                        useAgentSession["useAgentSession.ts"]
+                    end
+                    
+                    subgraph state["state/"]
+                        agentsState["agents.ts"]
+                        librariesState["libraries.ts"]
+                    end
+                    
+                    subgraph types["types/"]
+                        panelsTypes["panels.ts"]
+                    end
+                end
+                
+                indexHtml["index.html"]
+                webPkg["package.json"]
+                viteConfig["vite.config.ts"]
+            end
+        end
+        
+        subgraph packages["packages/"]
+            subgraph sharedUtils["@tljustdraw/shared-utils"]
+                subgraph sharedSrc["src/"]
+                    sharedIndex["index.ts"]
+                    configTs["config.ts"]
+                    loggerTs["logger.ts"]
+                end
+                sharedTests["__tests__/"]
+            end
+        end
+        
+        subgraph docs["docs/"]
+            archDocs["architecture/*.md"]
+            checklistDocs["checklists/*.md"]
+        end
+        
+        subgraph rootConfig["Root Configuration"]
+            rootPkg["package.json"]
+            pnpmWorkspace["pnpm-workspace.yaml"]
+            tsconfigBase["tsconfig.base.json"]
+            vitestConfig["vitest.config.ts"]
+        end
+    end
+    
+    subgraph external["External Dependencies"]
+        excalidraw["@excalidraw/excalidraw"]
+        react["react / react-dom"]
+        vite["vite"]
+        zod["zod"]
+    end
+    
+    subgraph rcFuture["Future: RevenueCat Integration"]
+        billingService["BillingService"]
+        entitlementProvider["EntitlementProvider"]
+        subscriptionPanel["SubscriptionPanel"]
+        webhookHandler["WebhookHandler (serverless)"]
+    end
+    
+    %% Component Dependencies
+    mainTsx --> appTsx
+    appTsx --> appLayout
+    appTsx --> canvasShell
+    appTsx --> libraryPanel
+    appTsx --> agentPanel
+    appTsx --> useAgentSession
+    appTsx --> agentsState
+    appTsx --> librariesState
+    
+    libraryPanel --> panelHeader
+    agentPanel --> panelHeader
+    
+    libraryPanel --> panelsTypes
+    agentPanel --> panelsTypes
+    useAgentSession --> panelsTypes
+    agentsState --> panelsTypes
+    librariesState --> panelsTypes
+    
+    canvasShell --> loggerTs
+    appTsx --> loggerTs
+    useAgentSession --> loggerTs
+    
+    sharedIndex --> configTs
+    sharedIndex --> loggerTs
+    
+    %% External Dependencies
+    canvasShell --> excalidraw
+    appTsx --> react
+    configTs --> zod
+    
+    %% Future RevenueCat
+    configTs -.-> billingService
+    billingService --> entitlementProvider
+    entitlementProvider --> subscriptionPanel
+
+    %% Styling
+    classDef entrypoint fill:#add8e6,stroke:#333
+    classDef component fill:#90ee90,stroke:#333
+    classDef hook fill:#f5deb3,stroke:#333
+    classDef state fill:#f0e68c,stroke:#333
+    classDef types fill:#dda0dd,stroke:#333
+    classDef config fill:#c0c0c0,stroke:#333
+    classDef util fill:#ffa500,stroke:#333
+    classDef external fill:#f08080,stroke:#333
+    classDef future fill:#ffb6c1,stroke:#333
+    
+    class mainTsx,appTsx,sharedIndex entrypoint
+    class canvasShell,appLayout,panelHeader,libraryPanel,agentPanel component
+    class useAgentSession hook
+    class agentsState,librariesState state
+    class panelsTypes types
+    class indexHtml,webPkg,viteConfig,rootPkg,pnpmWorkspace,tsconfigBase,vitestConfig config
+    class configTs,loggerTs util
+    class excalidraw,react,vite,zod external
+    class billingService,entitlementProvider,subscriptionPanel,webhookHandler future
